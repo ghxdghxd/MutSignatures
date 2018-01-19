@@ -57,9 +57,7 @@ option_list = list(
   make_option(c("-i", "--input"), type = "character", default = NULL, help = "the maf file",
     metavar = "file", dest = "maf"), 
   make_option(c("-n", "--name"), type = "character", default = NULL, help = "the disease name",
-    metavar = "str", dest = "name"),
-  make_option(c("-o", "--outdir"), type = "character", default = NULL, 
-    help = "outdir in the current working directory", metavar = "dir", dest = "outdir"))
+    metavar = "str", dest = "name"))
 
 opt_parser = OptionParser(usage = "usage: %prog [options]", 
     option_list = option_list, 
@@ -82,16 +80,12 @@ locateDir = paste0(getScriptLocation(), "/")
 source(paste(locateDir, "Functions.R", sep = ""))
 source(paste(locateDir, "get.context96_annotated.from.maf.R", sep = ""))
 
-if(is.null(opt$outdir)){
-  CURRENT <- paste(getwd(), "/", sep = "")
-  opt$outdir <- paste(CURRENT, "OUTPUT_lego96/", sep = "")
-}
+CURRENT <- paste(getwd(), "/", sep = "")
+OUTPUT <- paste(CURRENT, "OUTPUT_lego96/", sep = "")
 
-if(!file_test("-d", opt$outdir)){
-  dir.create(path = opt$outdir,recursive = TRUE)
+if(!file_test("-d", OUTPUT)){
+  dir.create(path = OUTPUT, recursive = TRUE)
 }
-
-opt$outdir = normalizePath(opt$outdir)
 
 library(gplots)
 library(ggplot2)
@@ -163,16 +157,16 @@ for (i in 1:n.iter) {
   } else {
     res <- BayesNMF.L2KL(as.matrix(lego96), 1e+05, a0, tol, Kcol, Kcol, 1)
   }
-  save(res, file = paste(opt$outdir, paste(method, a0, i, "RData", sep = "."), sep = ""))
+  save(res, file = paste(OUTPUT, paste(method, a0, i, "RData", sep = "."), sep = ""))
 }
 
 ##########################################################
 ###################### Analysis ##########################
 ##########################################################
-res.WES <- get.stats.simulation(tumor.type, n.iter, opt$outdir)
+res.WES <- get.stats.simulation(tumor.type, n.iter, OUTPUT)
 
 ############## frequency figure - this plot shows a distribution of # of signatures..
-pdf(file = paste(opt$outdir, paste(method, a0, "signature.freq.pdf", sep = "."), sep = ""), width = 4, height = 5)
+pdf(file = paste(OUTPUT, paste(method, a0, "signature.freq.pdf", sep = "."), sep = ""), width = 4, height = 5)
 s1 <- 1.5
 s2 <- 2
 par(mfrow = c(1, 1))
@@ -212,7 +206,7 @@ MAP.nontrivial <- MAP[names(MAP) != 1]
 n.K <- length(MAP.nontrivial)
 if (n.K > 0) { 
 for (j in 1:n.K) {
-  load(paste(opt$outdir,paste(method,a0,MAP.nontrivial[[j]],"RData",sep="."),sep=""))
+  load(paste(OUTPUT,paste(method,a0,MAP.nontrivial[[j]],"RData",sep="."),sep=""))
   W <- res[[1]]
   H <- res[[2]]
   W1 <- W
@@ -229,7 +223,7 @@ for (j in 1:n.K) {
   ############# Signature plot
   width <- 16
   height <- ifelse(K==1,3,K*2)
-  pdf(file = paste0(opt$outdir, paste(method, a0, paste0("MAP", K), "signature.pdf", sep = ".")), width = width,
+  pdf(file = paste0(OUTPUT, paste(method, a0, paste0("MAP", K), "signature.pdf", sep = ".")), width = width,
     height = height)
   p <- plot.lego.observed.barplot(df, paste("Mutation Signatures in ", tumor.type, sep = ""))
   plot(p)
@@ -285,18 +279,18 @@ for (j in 1:n.K) {
   ############# H.norm = normalized signature activity 
   ##########################################################
   WH <- list(W.norm, H.mid, H.norm)
-  save(WH, file = paste(opt$outdir, paste(method, a0, paste("MAP", K, sep = ""), "WH.RData", sep = "."),
+  save(WH, file = paste(OUTPUT, paste(method, a0, paste("MAP", K, sep = ""), "WH.RData", sep = "."),
     sep = ""))
 
   ############# Activity plot
   p1 <- plot.activity.barplot(H.mid,H.norm,1.0,tumor.type)
-  pdf(file = paste0(opt$outdir, paste(method, a0, "activity.barplot1", K, "pdf", sep = ".")), width = 15,
+  pdf(file = paste0(OUTPUT, paste(method, a0, "activity.barplot1", K, "pdf", sep = ".")), width = 15,
     height = 12)
   plot(p1)
   dev.off()
 
   main <- paste("Cosine similarity;",tumor.type,sep="")
-  pdf(file = paste0(opt$outdir, paste(method, a0, "signature.comprison.sanger", K, "pdf", sep = ".")),
+  pdf(file = paste0(OUTPUT, paste(method, a0, "signature.comprison.sanger", K, "pdf", sep = ".")),
     width = 4, height = 6)
   s1 <- 1.5
   s2 <- 2

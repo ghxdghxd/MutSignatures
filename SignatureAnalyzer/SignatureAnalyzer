@@ -1,0 +1,8 @@
+#!/bin/bash
+# @Date    : 2018-01-19 16:35:40
+# @Author  : JTGuo
+# @Email   : guojt-4451@163.com
+# @Version : $Id$
+
+exec PATH_to_SignatureAnalyzer.Broad.R "$@"
+

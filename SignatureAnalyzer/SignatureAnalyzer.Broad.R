@@ -55,11 +55,11 @@ library("optparse")
 
 option_list = list(
   make_option(c("-i", "--input"), type = "character", default = NULL, help = "the maf file",
-  metavar = "file", dest = "maf"), 
+    metavar = "file", dest = "maf"), 
   make_option(c("-n", "--name"), type = "character", default = NULL, help = "the disease name",
-  metavar = "str", dest = "name"),
-  make_option(c("-o", "--outdir"), type = "character", default = NULL, help = "the OUTPUT dir",
-  metavar = "dir", dest = "outdir"))
+    metavar = "str", dest = "name"),
+  make_option(c("-o", "--outdir"), type = "character", default = NULL, 
+    help = "outdir in the current working directory", metavar = "dir", dest = "outdir"))
 
 opt_parser = OptionParser(usage = "usage: %prog [options]", 
     option_list = option_list, 
@@ -87,9 +87,11 @@ if(is.null(opt$outdir)){
   opt$outdir <- paste(CURRENT, "OUTPUT_lego96/", sep = "")
 }
 
+if(!file_test("-d", opt$outdir)){
+  dir.create(path = opt$outdir,recursive = TRUE)
+}
 
-
-system(paste("mkdir", opt$outdir, sep = " "))
+opt$outdir = normalizePath(opt$outdir)
 
 library(gplots)
 library(ggplot2)
